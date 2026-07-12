@@ -6,7 +6,13 @@ export function ThemeToggle() {
   const [dark, setDark] = useState(false);
 
   useEffect(() => {
-    setDark(document.documentElement.classList.contains("dark"));
+    try {
+      const t = localStorage.getItem("theme");
+      if (t === "dark") {
+        document.documentElement.classList.add("dark");
+        setDark(true);
+      }
+    } catch {}
   }, []);
 
   function toggle() {

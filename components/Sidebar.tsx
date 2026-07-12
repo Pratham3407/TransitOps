@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { UserRole } from "@prisma/client";
-import { ROLE_MODULE_ACCESS, ModuleKey } from "@/lib/rbac";
+import { ModuleKey } from "@/lib/rbac";
 
 const NAV_ITEMS: { module: ModuleKey; href: string; label: string }[] = [
   { module: "dashboard", href: "/dashboard", label: "Dashboard" },
@@ -18,6 +18,13 @@ const NAV_ITEMS: { module: ModuleKey; href: string; label: string }[] = [
   { module: "settings", href: "/settings", label: "Settings" },
 ];
 
+const ROLE_MODULES: Record<UserRole, ModuleKey[]> = {
+  FLEET_MANAGER: ["dashboard", "fleet", "maintenance", "analytics", "settings", "audit"],
+  DISPATCHER: ["dashboard", "trips", "audit"],
+  SAFETY_OFFICER: ["dashboard", "drivers", "safety"],
+  FINANCIAL_ANALYST: ["dashboard", "fuelExpenses", "analytics"],
+};
+
 export function Sidebar({
   role,
   name,
@@ -29,7 +36,7 @@ export function Sidebar({
 }) {
   const pathname = usePathname();
   const router = useRouter();
-  const allowed = new Set(ROLE_MODULE_ACCESS[role]);
+  const allowed = new Set(ROLE_MODULES[role] ?? []);
 
   async function handleLogout() {
     await fetch("/api/auth/logout", { method: "POST" });
