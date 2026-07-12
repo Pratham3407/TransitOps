@@ -5,6 +5,8 @@ import { Card } from "@/components/Card";
 import { Modal } from "@/components/Modal";
 import { FormField, inputClass, buttonPrimaryClass, buttonSecondaryClass } from "@/components/FormField";
 import { StatusBadge } from "@/components/Badge";
+import { Toast } from "@/components/Toast";
+import { useToast } from "@/lib/useToast";
 
 type Vehicle = { id: string; registrationNumber: string; nameModel: string; status: string };
 type Driver = { id: string; name: string; licenseExpiryDate: string; status: string };
@@ -27,7 +29,7 @@ export default function TripsPage() {
   const [drivers, setDrivers] = useState<Driver[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [toast, setToast] = useState<string | null>(null);
+  const { toast, showToast, clearToast } = useToast();
 
   const [createOpen, setCreateOpen] = useState(false);
   const [completeTrip, setCompleteTrip] = useState<Trip | null>(null);
@@ -74,11 +76,6 @@ export default function TripsPage() {
     load();
   }, [load]);
 
-  const showToast = (msg: string) => {
-    setToast(msg);
-    setTimeout(() => setToast(null), 4000);
-  };
-
   async function suggest() {
     setError(null);
     if (!form.cargoWeightKg) {
@@ -93,11 +90,11 @@ export default function TripsPage() {
     });
     const data = await res.json();
     if (!res.ok) {
-      setError(data.error ?? "Suggestion failed");
+      showToast(data.error ?? "Suggestion failed", "error");
       return;
     }
     if (!data.suggestions.length) {
-      setError(data.message ?? "No suitable vehicle/driver found");
+      showToast(data.message ?? "No suitable vehicle/driver found", "error");
       return;
     }
     const top = data.suggestions[0];
@@ -124,7 +121,7 @@ export default function TripsPage() {
     });
     const data = await res.json();
     if (!res.ok) {
-      setError(data.error ?? "Failed to create trip");
+      showToast(data.error ?? "Failed to create trip", "error");
       return;
     }
     setCreateOpen(false);
@@ -134,14 +131,13 @@ export default function TripsPage() {
   }
 
   async function dispatch(id: string) {
-    setError(null);
     const res = await fetch(`/api/trips/${id}/dispatch`, {
       method: "POST",
       credentials: "include",
     });
     const data = await res.json();
     if (!res.ok) {
-      setError(data.error ?? "Failed to dispatch");
+      showToast(data.error ?? "Failed to dispatch", "error");
       return;
     }
     showToast(`Trip ${data.trip.tripCode} dispatched`);
@@ -149,14 +145,13 @@ export default function TripsPage() {
   }
 
   async function cancel(id: string) {
-    setError(null);
     const res = await fetch(`/api/trips/${id}/cancel`, {
       method: "POST",
       credentials: "include",
     });
     const data = await res.json();
     if (!res.ok) {
-      setError(data.error ?? "Failed to cancel");
+      showToast(data.error ?? "Failed to cancel", "error");
       return;
     }
     showToast(`Trip ${data.trip.tripCode} cancelled`);
@@ -164,7 +159,6 @@ export default function TripsPage() {
   }
 
   async function complete(id: string) {
-    setError(null);
     const res = await fetch(`/api/trips/${id}/complete`, {
       method: "POST",
       credentials: "include",
@@ -178,7 +172,7 @@ export default function TripsPage() {
     });
     const data = await res.json();
     if (!res.ok) {
-      setError(data.error ?? "Failed to complete");
+      showToast(data.error ?? "Failed to complete", "error");
       return;
     }
     setCompleteTrip(null);
@@ -194,11 +188,7 @@ export default function TripsPage() {
 
   return (
     <div className="space-y-6">
-      {toast && (
-        <div className="fixed top-4 right-4 z-50 rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white shadow-lg">
-          {toast}
-        </div>
-      )}
+      {toast && <Toast message={toast.message} type={toast.type} onClose={clearToast} />}
 
       <div className="flex items-center justify-between">
         <div>

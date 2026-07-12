@@ -5,6 +5,8 @@ import { Card } from "@/components/Card";
 import { Modal } from "@/components/Modal";
 import { FormField, inputClass, buttonPrimaryClass, buttonSecondaryClass } from "@/components/FormField";
 import { StatusBadge } from "@/components/Badge";
+import { Toast } from "@/components/Toast";
+import { useToast } from "@/lib/useToast";
 
 type Vehicle = { id: string; registrationNumber: string; nameModel: string };
 type MaintenanceLog = {
@@ -22,7 +24,7 @@ export default function MaintenancePage() {
   const [vehicles, setVehicles] = useState<Vehicle[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [toast, setToast] = useState<string | null>(null);
+  const { toast, showToast, clearToast } = useToast();
 
   const [createOpen, setCreateOpen] = useState(false);
   const [form, setForm] = useState({
@@ -58,11 +60,6 @@ export default function MaintenancePage() {
     load();
   }, [load]);
 
-  const showToast = (msg: string) => {
-    setToast(msg);
-    setTimeout(() => setToast(null), 4000);
-  };
-
   async function createLog() {
     setError(null);
     const res = await fetch("/api/maintenance", {
@@ -79,7 +76,7 @@ export default function MaintenancePage() {
     });
     const data = await res.json();
     if (!res.ok) {
-      setError(data.error ?? "Failed to create maintenance log");
+      showToast(data.error ?? "Failed to create maintenance log", "error");
       return;
     }
     setCreateOpen(false);
@@ -89,14 +86,13 @@ export default function MaintenancePage() {
   }
 
   async function closeLog(id: string) {
-    setError(null);
     const res = await fetch(`/api/maintenance/${id}/close`, {
       method: "POST",
       credentials: "include",
     });
     const data = await res.json();
     if (!res.ok) {
-      setError(data.error ?? "Failed to close maintenance log");
+      showToast(data.error ?? "Failed to close maintenance log", "error");
       return;
     }
     showToast("Maintenance log closed — vehicle back to AVAILABLE");
@@ -108,11 +104,7 @@ export default function MaintenancePage() {
 
   return (
     <div className="space-y-6">
-      {toast && (
-        <div className="fixed top-4 right-4 z-50 rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white shadow-lg">
-          {toast}
-        </div>
-      )}
+      {toast && <Toast message={toast.message} type={toast.type} onClose={clearToast} />}
 
       <div className="flex items-center justify-between">
         <div>

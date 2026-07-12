@@ -5,6 +5,8 @@ import { Card } from "@/components/Card";
 import { Modal } from "@/components/Modal";
 import { FormField, inputClass, buttonPrimaryClass, buttonSecondaryClass } from "@/components/FormField";
 import { StatusBadge } from "@/components/Badge";
+import { Toast } from "@/components/Toast";
+import { useToast } from "@/lib/useToast";
 
 type Vehicle = { id: string; registrationNumber: string; nameModel: string };
 type Trip = { id: string; tripCode: string };
@@ -34,7 +36,7 @@ export default function FuelExpensesPage() {
   const [expenses, setExpenses] = useState<Expense[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [toast, setToast] = useState<string | null>(null);
+  const { toast, showToast, clearToast } = useToast();
 
   const [fuelOpen, setFuelOpen] = useState(false);
   const [expenseOpen, setExpenseOpen] = useState(false);
@@ -83,11 +85,6 @@ export default function FuelExpensesPage() {
     load();
   }, [load]);
 
-  const showToast = (msg: string) => {
-    setToast(msg);
-    setTimeout(() => setToast(null), 4000);
-  };
-
   async function createFuel() {
     setError(null);
     const res = await fetch("/api/fuel-logs", {
@@ -104,7 +101,7 @@ export default function FuelExpensesPage() {
     });
     const data = await res.json();
     if (!res.ok) {
-      setError(data.error ?? "Failed to create fuel log");
+      showToast(data.error ?? "Failed to create fuel log", "error");
       return;
     }
     setFuelOpen(false);
@@ -129,7 +126,7 @@ export default function FuelExpensesPage() {
     });
     const data = await res.json();
     if (!res.ok) {
-      setError(data.error ?? "Failed to create expense");
+      showToast(data.error ?? "Failed to create expense", "error");
       return;
     }
     setExpenseOpen(false);
@@ -143,11 +140,7 @@ export default function FuelExpensesPage() {
 
   return (
     <div className="space-y-6">
-      {toast && (
-        <div className="fixed top-4 right-4 z-50 rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white shadow-lg">
-          {toast}
-        </div>
-      )}
+      {toast && <Toast message={toast.message} type={toast.type} onClose={clearToast} />}
 
       <div className="flex items-center justify-between">
         <div>
