@@ -79,6 +79,34 @@ export default function TripsPage() {
     setTimeout(() => setToast(null), 4000);
   };
 
+  async function suggest() {
+    setError(null);
+    if (!form.cargoWeightKg) {
+      setError("Enter cargo weight to get a smart suggestion");
+      return;
+    }
+    const res = await fetch("/api/trips/suggest", {
+      method: "POST",
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ cargoWeightKg: Number(form.cargoWeightKg) }),
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      setError(data.error ?? "Suggestion failed");
+      return;
+    }
+    if (!data.suggestions.length) {
+      setError(data.message ?? "No suitable vehicle/driver found");
+      return;
+    }
+    const top = data.suggestions[0];
+    setForm((f) => ({ ...f, vehicleId: top.vehicle.id, driverId: top.driver.id }));
+    showToast(
+      `Suggested ${top.vehicle.registrationNumber} + ${top.driver.name} (${top.capacityUtilization}% capacity)`
+    );
+  }
+
   async function createTrip() {
     setError(null);
     const res = await fetch("/api/trips", {
@@ -285,14 +313,23 @@ export default function TripsPage() {
           <input className={inputClass} value={form.destination} onChange={(e) => setForm({ ...form, destination: e.target.value })} placeholder="e.g. East Yard" />
         </FormField>
         <FormField label="Vehicle (Available only)">
-          <select className={inputClass} value={form.vehicleId} onChange={(e) => setForm({ ...form, vehicleId: e.target.value })}>
-            <option value="">Select vehicle</option>
-            {availableVehicles.map((v) => (
-              <option key={v.id} value={v.id}>
-                {v.registrationNumber} — {v.nameModel}
-              </option>
-            ))}
-          </select>
+          <div className="flex gap-2">
+            <select className={inputClass} value={form.vehicleId} onChange={(e) => setForm({ ...form, vehicleId: e.target.value })}>
+              <option value="">Select vehicle</option>
+              {availableVehicles.map((v) => (
+                <option key={v.id} value={v.id}>
+                  {v.registrationNumber} — {v.nameModel}
+                </option>
+              ))}
+            </select>
+            <button
+              type="button"
+              onClick={suggest}
+              className="whitespace-nowrap rounded-lg border border-zinc-300 px-3 py-2 text-xs font-medium text-zinc-700 hover:bg-zinc-50"
+            >
+              ✨ Smart Suggest
+            </button>
+          </div>
         </FormField>
         <FormField label="Driver (Eligible only)">
           <select className={inputClass} value={form.driverId} onChange={(e) => setForm({ ...form, driverId: e.target.value })}>
