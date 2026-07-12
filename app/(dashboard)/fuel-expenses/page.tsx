@@ -137,6 +137,21 @@ export default function FuelExpensesPage() {
     load();
   }
 
+  async function markCompleted(id: string) {
+    const res = await fetch(`/api/expenses/${id}`, {
+      method: "PATCH",
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ status: "COMPLETED" }),
+    });
+    if (!res.ok) {
+      showToast("Failed to update status", "error");
+      return;
+    }
+    showToast("Expense marked as completed");
+    load();
+  }
+
   const totalFuelCost = fuelLogs.reduce((a, l) => a + l.cost, 0);
   const totalExpenseCost = expenses.reduce((a, e) => a + e.total, 0);
 
@@ -272,6 +287,7 @@ export default function FuelExpensesPage() {
                     <th className="py-2 pr-4">Other</th>
                     <th className="py-2 pr-4">Total</th>
                     <th className="py-2 pr-4">Status</th>
+                    <th className="py-2 pr-4">Action</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -287,11 +303,21 @@ export default function FuelExpensesPage() {
                       <td className="py-2 pr-4">
                         <StatusBadge status={e.status} />
                       </td>
+                      <td className="py-2 pr-4">
+                        {e.status === "PENDING" && (
+                          <button
+                            onClick={() => markCompleted(e.id)}
+                            className="rounded-md bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-700 hover:bg-emerald-100 transition-colors"
+                          >
+                            Mark Completed
+                          </button>
+                        )}
+                      </td>
                     </tr>
                   ))}
                   {expenses.length === 0 && (
                     <tr>
-                      <td colSpan={6} className="py-4 text-center text-zinc-500">
+                      <td colSpan={7} className="py-4 text-center text-zinc-500">
                         No expenses yet.
                       </td>
                     </tr>
