@@ -12,6 +12,7 @@ import {
   CartesianGrid,
 } from "recharts";
 import { Card, KpiCard } from "@/components/Card";
+import { formatCurrency } from "@/lib/format";
 
 type Analytics = {
   fleetFuelEfficiency: number;
@@ -96,8 +97,8 @@ export default function AnalyticsPage() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <KpiCard label="Fleet Fuel Efficiency" value={`${data.fleetFuelEfficiency} km/L`} />
-        <KpiCard label="Operational Cost" value={`$${data.operationalCost.toLocaleString()}`} />
-        <KpiCard label="Total Revenue" value={`$${data.totalRevenue.toLocaleString()}`} />
+        <KpiCard label="Operational Cost" value={formatCurrency(data.operationalCost)} />
+        <KpiCard label="Total Revenue" value={formatCurrency(data.totalRevenue)} />
         <KpiCard label="Fleet Utilization" value={`${data.fleetUtilization}%`} />
       </div>
 
@@ -143,13 +144,13 @@ export default function AnalyticsPage() {
           <div className="flex justify-between border-b border-zinc-100 py-2">
             <span className="text-sm text-zinc-600">Total Fuel Cost</span>
             <span className="text-sm font-medium text-zinc-900">
-              ${data.totalFuelCost.toLocaleString()}
+              {formatCurrency(data.totalFuelCost)}
             </span>
           </div>
           <div className="flex justify-between border-b border-zinc-100 py-2">
             <span className="text-sm text-zinc-600">Total Maintenance</span>
             <span className="text-sm font-medium text-zinc-900">
-              ${data.totalMaintenance.toLocaleString()}
+               {formatCurrency(data.totalMaintenance)}
             </span>
           </div>
         </div>

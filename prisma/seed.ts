@@ -47,7 +47,7 @@ async function main() {
   await prisma.settings.create({
     data: {
       depotName: "Central Depot",
-      currency: "USD",
+      currency: "INR",
       distanceUnit: "km",
       rolePermissions: JSON.stringify({
         FLEET_MANAGER: { fleet: "edit", drivers: "view", trips: "view", fuelExpenses: "view", analytics: "edit" },

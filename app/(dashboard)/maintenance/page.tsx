@@ -7,6 +7,7 @@ import { FormField, inputClass, buttonPrimaryClass, buttonSecondaryClass } from 
 import { StatusBadge } from "@/components/Badge";
 import { Toast } from "@/components/Toast";
 import { useToast } from "@/lib/useToast";
+import { formatCurrency } from "@/lib/format";
 
 type Vehicle = { id: string; registrationNumber: string; nameModel: string };
 type MaintenanceLog = {
@@ -134,7 +135,7 @@ export default function MaintenancePage() {
         <Card>
           <h2 className="text-sm font-medium text-zinc-500">Total Cost</h2>
           <p className="mt-1 text-2xl font-semibold text-zinc-900">
-            ${totalCost.toLocaleString()}
+            {formatCurrency(totalCost)}
           </p>
         </Card>
       </div>
@@ -165,7 +166,7 @@ export default function MaintenancePage() {
                     </td>
                     <td className="py-2 pr-4 text-zinc-600">{l.serviceType}</td>
                     <td className="py-2 pr-4 text-zinc-600">{l.servicerName ?? "—"}</td>
-                    <td className="py-2 pr-4 text-zinc-600">${l.cost.toLocaleString()}</td>
+                      <td className="py-2 pr-4 text-zinc-600">{formatCurrency(l.cost)}</td>
                     <td className="py-2 pr-4 text-zinc-600">
                       {new Date(l.date).toLocaleDateString()}
                     </td>

@@ -123,7 +123,7 @@ export default function SettingsPage() {
               <input className={inputClass} value={form.depotName} onChange={(e) => setForm({ ...form, depotName: e.target.value })} />
             </FormField>
             <FormField label="Currency">
-              <input className={inputClass} value={form.currency} onChange={(e) => setForm({ ...form, currency: e.target.value })} placeholder="USD" />
+              <input className={inputClass} value={form.currency} onChange={(e) => setForm({ ...form, currency: e.target.value })} placeholder="INR" />
             </FormField>
             <FormField label="Distance Unit">
               <select className={inputClass} value={form.distanceUnit} onChange={(e) => setForm({ ...form, distanceUnit: e.target.value })}>

@@ -7,6 +7,7 @@ import { FormField, inputClass, buttonPrimaryClass, buttonSecondaryClass } from 
 import { StatusBadge } from "@/components/Badge";
 import { Toast } from "@/components/Toast";
 import { useToast } from "@/lib/useToast";
+import { formatCurrency } from "@/lib/format";
 
 type Vehicle = { id: string; registrationNumber: string; nameModel: string };
 type Trip = { id: string; tripCode: string };
@@ -187,7 +188,7 @@ export default function FuelExpensesPage() {
             <Card>
               <h2 className="text-sm font-medium text-zinc-500">Total Fuel Cost</h2>
               <p className="mt-1 text-2xl font-semibold text-zinc-900">
-                ${totalFuelCost.toLocaleString()}
+                {formatCurrency(totalFuelCost)}
               </p>
             </Card>
             <div className="flex items-end">
@@ -221,7 +222,7 @@ export default function FuelExpensesPage() {
                         {new Date(l.date).toLocaleDateString()}
                       </td>
                       <td className="py-2 pr-4 text-zinc-600">{l.liters}</td>
-                      <td className="py-2 pr-4 text-zinc-600">${l.cost.toLocaleString()}</td>
+                      <td className="py-2 pr-4 text-zinc-600">{formatCurrency(l.cost)}</td>
                     </tr>
                   ))}
                   {fuelLogs.length === 0 && (
@@ -242,7 +243,7 @@ export default function FuelExpensesPage() {
             <Card>
               <h2 className="text-sm font-medium text-zinc-500">Total Expenses</h2>
               <p className="mt-1 text-2xl font-semibold text-zinc-900">
-                ${totalExpenseCost.toLocaleString()}
+                {formatCurrency(totalExpenseCost)}
               </p>
             </Card>
             <Card>
@@ -279,9 +280,9 @@ export default function FuelExpensesPage() {
                         {e.vehicle?.registrationNumber ?? "—"}
                       </td>
                       <td className="py-2 pr-4 text-zinc-600">{e.trip?.tripCode ?? "—"}</td>
-                      <td className="py-2 pr-4 text-zinc-600">${e.toll.toLocaleString()}</td>
-                      <td className="py-2 pr-4 text-zinc-600">${e.otherMisc.toLocaleString()}</td>
-                      <td className="py-2 pr-4 text-zinc-600">${e.total.toLocaleString()}</td>
+                      <td className="py-2 pr-4 text-zinc-600">{formatCurrency(e.toll)}</td>
+                      <td className="py-2 pr-4 text-zinc-600">{formatCurrency(e.otherMisc)}</td>
+                      <td className="py-2 pr-4 text-zinc-600">{formatCurrency(e.total)}</td>
                       <td className="py-2 pr-4">
                         <StatusBadge status={e.status} />
                       </td>

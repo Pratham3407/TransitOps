@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Table, Thead, EmptyRow, LoadingRow } from "@/components/Table";
 import { StatusBadge } from "@/components/Badge";
+import { formatCurrency } from "@/lib/format";
 import { Modal } from "@/components/Modal";
 import { FormField, inputClass, buttonPrimaryClass, buttonSecondaryClass } from "@/components/FormField";
 
@@ -184,7 +185,7 @@ export default function FleetPage() {
               <td className="px-4 py-3">{v.type}</td>
               <td className="px-4 py-3">{v.maxLoadCapacityKg} kg</td>
               <td className="px-4 py-3">{v.odometerKm.toLocaleString()} km</td>
-              <td className="px-4 py-3">${v.acquisitionCost.toLocaleString()}</td>
+              <td className="px-4 py-3">{formatCurrency(v.acquisitionCost)}</td>
               <td className="px-4 py-3">
                 <StatusBadge status={v.status} />
               </td>
