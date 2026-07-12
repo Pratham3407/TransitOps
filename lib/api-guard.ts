@@ -11,6 +11,7 @@ export function withAuth(
   if (!session) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
+  if (session.role === "SUPER_ADMIN") return session;
   if (roles && !roles.includes(session.role)) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
