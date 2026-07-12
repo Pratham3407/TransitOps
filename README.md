@@ -352,11 +352,3 @@ npx vitest run
 
 ---
 
-## Author
-
-Built by **Rudra** for the Odoo Hackathon.
-GitHub: [@24CS105-RUDRA](https://github.com/24CS105-RUDRA)
-
-## License
-
-MIT — Hackathon submission, 2026.
