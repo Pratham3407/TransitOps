@@ -343,12 +343,4 @@ npx vitest run
 
 ---
 
-## Known Limitations
-
-- SMS gateway not integrated (only email reminders).
-- Telematics OBD-II integration not implemented (GPS pings are simulated).
-- No multi-language support (English only).
-- No PDF export (browsers' built-in print-to-PDF used).
-
----
 
