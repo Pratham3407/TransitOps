@@ -33,12 +33,14 @@ const STATUS_COLORS: Record<string, string> = {
   RETIRED: "#94a3b8",
 };
 
-function getMarkerIcon(status: string) {
+function getMarkerIcon(status: string, label: string) {
   const color = STATUS_COLORS[status] ?? "#6b7280";
+  const short = label.length > 8 ? label.slice(0, 8) + "…" : label;
   return `data:image/svg+xml,${encodeURIComponent(
-    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="${color}" width="32" height="32">
-      <circle cx="12" cy="12" r="10" fill="${color}" stroke="white" stroke-width="2"/>
-      <circle cx="12" cy="12" r="4" fill="white"/>
+    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 40" width="80" height="40">
+      <rect x="0" y="0" width="80" height="40" rx="6" fill="${color}" stroke="white" stroke-width="2"/>
+      <text x="40" y="16" text-anchor="middle" fill="white" font-size="10" font-family="monospace" font-weight="bold">${short}</text>
+      <circle cx="40" cy="30" r="3" fill="white"/>
     </svg>`
   )}`;
 }
@@ -84,18 +86,19 @@ function MapInner({ vehicles, selectedId, onSelect, trackPositions }: MapInnerPr
       vehicles.forEach((v) => {
         if (v.latitude == null || v.longitude == null) return;
         const icon = L.icon({
-          iconUrl: getMarkerIcon(v.status),
-          iconSize: [32, 32],
-          iconAnchor: [16, 16],
+          iconUrl: getMarkerIcon(v.status, v.registrationNumber),
+          iconSize: [80, 40],
+          iconAnchor: [40, 40],
         });
         const marker = L.marker([v.latitude, v.longitude], { icon })
           .addTo(map)
           .bindPopup(
-            `<div style="font-size:13px">
-              <strong>${v.registrationNumber}</strong><br/>
-              ${v.nameModel}<br/>
-              <span style="color:${STATUS_COLORS[v.status]}">${v.status.replace("_", " ")}</span>
-              ${v.speed != null ? `<br/>Speed: ${v.speed} km/h` : ""}
+            `<div style="font-size:13px;min-width:140px">
+              <strong style="font-size:14px">${v.registrationNumber}</strong><br/>
+              <span style="color:#666">${v.nameModel}</span><br/>
+              <span style="display:inline-block;margin-top:4px;padding:2px 8px;border-radius:12px;background:${STATUS_COLORS[v.status]}22;color:${STATUS_COLORS[v.status]};font-weight:600;font-size:12px">${v.status.replace("_", " ")}</span>
+              ${v.speed != null ? `<br/><span style="margin-top:4px;display:inline-block">Speed: <strong>${v.speed} km/h</strong></span>` : ""}
+              ${v.region ? `<br/><span style="color:#888">Region: ${v.region}</span>` : ""}
             </div>`
           );
         marker.on("click", () => onSelect(v.id));
@@ -202,7 +205,12 @@ export function FleetMap({
   return (
     <Card>
       <div className="mb-3 flex items-center justify-between">
-        <h2 className="text-xl font-semibold text-zinc-900">Live Fleet Map</h2>
+        <h2 className="text-xl font-semibold text-zinc-900">
+          Live Fleet Map
+          <span className="ml-2 text-sm font-normal text-zinc-500">
+            ({vehicles.length} vehicle{vehicles.length !== 1 ? "s" : ""})
+          </span>
+        </h2>
         <div className="flex items-center gap-4 text-xs">
           {Object.entries(STATUS_COLORS).map(([status, color]) => (
             <span key={status} className="flex items-center gap-1">
@@ -212,7 +220,7 @@ export function FleetMap({
           ))}
         </div>
       </div>
-      <div className="h-96 w-full overflow-hidden rounded-lg border border-zinc-200">
+      <div className="h-[480px] w-full overflow-hidden rounded-lg border border-zinc-200">
         <DynamicMapInner
           vehicles={vehicles}
           selectedId={selectedId}
@@ -220,7 +228,7 @@ export function FleetMap({
         />
       </div>
       <p className="mt-2 text-xs text-zinc-400">
-        Refreshes every {refreshInterval / 1000}s · {vehicles.length} vehicles with GPS data
+        Auto-refreshes every {refreshInterval / 1000}s · Click a vehicle label for details
       </p>
     </Card>
   );

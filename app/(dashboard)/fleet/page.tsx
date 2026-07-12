@@ -173,21 +173,28 @@ export default function FleetPage() {
             Registration No. must be unique. Retired/In Shop vehicles are hidden from Trip Dispatcher.
           </p>
         </div>
-        <button onClick={openAdd} className={buttonPrimaryClass}>
-          + Add Vehicle
-        </button>
+        <div className="flex items-center gap-3">
+          <button
+            onClick={() => setShowMap((s) => !s)}
+            className={`rounded-lg border px-4 py-2 text-sm font-medium ${
+              showMap
+                ? "border-blue-300 bg-blue-50 text-blue-700"
+                : "border-zinc-300 text-zinc-700 hover:bg-zinc-50"
+            }`}
+          >
+            {showMap ? "🗺️ Map On" : "🗺️ Show Map"}
+          </button>
+          <button onClick={openAdd} className={buttonPrimaryClass}>
+            + Add Vehicle
+          </button>
+        </div>
       </div>
 
-      <div className="mb-4">
-        <button
-          onClick={() => setShowMap((s) => !s)}
-          className="text-sm font-medium text-blue-600 hover:underline"
-        >
-          {showMap ? "Hide Map" : "Show Live Map"}
-        </button>
-      </div>
-
-      {showMap && <FleetMap refreshInterval={5000} />}
+      {showMap && (
+        <div className="mb-6">
+          <FleetMap refreshInterval={5000} />
+        </div>
+      )}
 
       <div className="mb-4 flex flex-wrap gap-3">
         <input
