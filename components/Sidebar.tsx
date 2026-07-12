@@ -87,15 +87,22 @@ export function Sidebar({
         if (!res.ok) return;
         const data = await res.json();
         const settings = data?.settings;
-        if (!settings?.rolePermissions) return;
+        if (!settings?.rolePermissions) {
+          setAllowed(new Set(ROLE_MODULES[role] ?? []));
+          return;
+        }
         const custom = parseRolePermissions(settings.rolePermissions);
         if (custom && custom[role]) {
           const modules = custom[role].filter((m): m is ModuleKey => (ALL_MODULES as string[]).includes(m));
-          setAllowed(new Set(modules));
+          setAllowed(new Set(modules.length > 0 ? modules : ROLE_MODULES[role] ?? []));
+        } else {
+          setAllowed(new Set(ROLE_MODULES[role] ?? []));
         }
       })
-      .catch(() => {});
-  }, [role]);
+      .catch(() => {
+        setAllowed(new Set(ROLE_MODULES[role] ?? []));
+      });
+  }, [role, pathname]);
 
   async function handleLogout() {
     await fetch("/api/auth/logout", { method: "POST" });
