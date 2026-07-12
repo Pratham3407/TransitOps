@@ -17,44 +17,21 @@ async function main() {
 
   const password = await bcrypt.hash("password123", 10);
 
+  // ─── Users ────────────────────────────────────────────
   await prisma.user.createMany({
     data: [
-      {
-        name: "Admin Master",
-        email: "admin@transitops.com",
-        passwordHash: password,
-        role: "SUPER_ADMIN",
-      },
-      {
-        name: "Frank Fleet",
-        email: "fleetmanager@transitops.com",
-        passwordHash: password,
-        role: "FLEET_MANAGER",
-      },
-      {
-        name: "Dana Dispatcher",
-        email: "dispatcher@transitops.com",
-        passwordHash: password,
-        role: "DISPATCHER",
-      },
-      {
-        name: "Sam Safety",
-        email: "safety@transitops.com",
-        passwordHash: password,
-        role: "SAFETY_OFFICER",
-      },
-      {
-        name: "Fiona Finance",
-        email: "finance@transitops.com",
-        passwordHash: password,
-        role: "FINANCIAL_ANALYST",
-      },
+      { name: "Rajesh Kumar", email: "admin@transitops.com", passwordHash: password, role: "SUPER_ADMIN" },
+      { name: "Amit Sharma", email: "fleetmanager@transitops.com", passwordHash: password, role: "FLEET_MANAGER" },
+      { name: "Priya Verma", email: "dispatcher@transitops.com", passwordHash: password, role: "DISPATCHER" },
+      { name: "Suresh Nair", email: "safety@transitops.com", passwordHash: password, role: "SAFETY_OFFICER" },
+      { name: "Ananya Gupta", email: "finance@transitops.com", passwordHash: password, role: "FINANCIAL_ANALYST" },
     ],
   });
 
+  // ─── Settings ─────────────────────────────────────────
   await prisma.settings.create({
     data: {
-      depotName: "Central Depot",
+      depotName: "Mumbai Central Depot",
       currency: "INR",
       distanceUnit: "km",
       rolePermissions: JSON.stringify({
@@ -66,259 +43,383 @@ async function main() {
     },
   });
 
-  const vanNorth = await prisma.vehicle.create({
+  // ─── Vehicles ─────────────────────────────────────────
+  // Indian registration format: XX ## XX ####
+  const tataAce = await prisma.vehicle.create({
     data: {
-      registrationNumber: "VAN-05",
-      nameModel: "Ford Transit",
-      type: "VAN",
-      maxLoadCapacityKg: 500,
-      odometerKm: 18230,
-      acquisitionCost: 32000,
-      region: "North",
+      registrationNumber: "MH 01 AB 1234",
+      nameModel: "Tata Ace Gold",
+      type: "MINI",
+      maxLoadCapacityKg: 750,
+      odometerKm: 34500,
+      acquisitionCost: 585000,
+      region: "West — Mumbai",
+      latitude: 19.0760,
+      longitude: 72.8777,
+      status: "AVAILABLE",
+    },
+  });
+
+  const eicherPro = await prisma.vehicle.create({
+    data: {
+      registrationNumber: "DL 03 CD 5678",
+      nameModel: "Eicher Pro 2049",
+      type: "TRUCK",
+      maxLoadCapacityKg: 5000,
+      odometerKm: 67800,
+      acquisitionCost: 1650000,
+      region: "North — Delhi",
       latitude: 28.6139,
       longitude: 77.2090,
       status: "AVAILABLE",
     },
   });
-  const truckEast = await prisma.vehicle.create({
+
+  const boleroPickup = await prisma.vehicle.create({
     data: {
-      registrationNumber: "TRK-12",
-      nameModel: "Volvo FH16",
-      type: "TRUCK",
-      maxLoadCapacityKg: 12000,
-      odometerKm: 84210,
-      acquisitionCost: 145000,
-      region: "East",
-      latitude: 22.5726,
-      longitude: 88.3639,
-      status: "AVAILABLE",
+      registrationNumber: "KA 01 EF 9012",
+      nameModel: "Mahindra Bolero Pikup",
+      type: "VAN",
+      maxLoadCapacityKg: 1000,
+      odometerKm: 52300,
+      acquisitionCost: 850000,
+      region: "South — Bangalore",
+      latitude: 12.9716,
+      longitude: 77.5946,
+      status: "ON_TRIP",
     },
   });
-  const miniWest = await prisma.vehicle.create({
+
+  const ashokLeyland = await prisma.vehicle.create({
     data: {
-      registrationNumber: "MIN-01",
-      nameModel: "Tata Ace",
-      type: "MINI",
-      maxLoadCapacityKg: 750,
+      registrationNumber: "TN 02 GH 3456",
+      nameModel: "Ashok Leyland Dost+",
+      type: "VAN",
+      maxLoadCapacityKg: 1200,
       odometerKm: 41200,
-      acquisitionCost: 12000,
-      region: "West",
-      latitude: 19.0760,
-      longitude: 72.8777,
+      acquisitionCost: 720000,
+      region: "South — Chennai",
+      latitude: 13.0827,
+      longitude: 80.2707,
       status: "IN_SHOP",
     },
   });
-  const truckSouth = await prisma.vehicle.create({
+
+  const bharatBenz = await prisma.vehicle.create({
     data: {
-      registrationNumber: "TRK-07",
-      nameModel: "Scania R500",
+      registrationNumber: "GJ 01 IJ 7890",
+      nameModel: "BharatBenz 1617",
       type: "TRUCK",
-      maxLoadCapacityKg: 15000,
-      odometerKm: 132500,
-      acquisitionCost: 160000,
-      region: "South",
-      latitude: 13.0827,
-      longitude: 80.2707,
-      status: "RETIRED",
-    },
-  });
-  const vanEast = await prisma.vehicle.create({
-    data: {
-      registrationNumber: "VAN-09",
-      nameModel: "Mercedes Sprinter",
-      type: "VAN",
-      maxLoadCapacityKg: 900,
-      odometerKm: 22400,
-      acquisitionCost: 38000,
-      region: "East",
-      latitude: 22.5726,
-      longitude: 88.3639,
+      maxLoadCapacityKg: 16000,
+      odometerKm: 112400,
+      acquisitionCost: 2200000,
+      region: "West — Ahmedabad",
+      latitude: 23.0225,
+      longitude: 72.5714,
       status: "AVAILABLE",
     },
   });
 
-  const alex = await prisma.driver.create({
+  const forceTraveller = await prisma.vehicle.create({
     data: {
-      name: "Alex Morgan",
-      licenseNumber: "DL-100234",
-      licenseCategory: "LMV",
-      licenseExpiryDate: new Date("2027-05-10"),
-      contactNumber: "+1-202-555-0142",
+      registrationNumber: "UP 14 KL 2345",
+      nameModel: "Force Traveller 3350",
+      type: "VAN",
+      maxLoadCapacityKg: 2000,
+      odometerKm: 28900,
+      acquisitionCost: 1150000,
+      region: "North — Lucknow",
+      latitude: 26.8467,
+      longitude: 80.9462,
+      status: "AVAILABLE",
+    },
+  });
+
+  const tataSigna = await prisma.vehicle.create({
+    data: {
+      registrationNumber: "RJ 14 MN 6789",
+      nameModel: "Tata Signa 4825",
+      type: "TRUCK",
+      maxLoadCapacityKg: 25000,
+      odometerKm: 189000,
+      acquisitionCost: 3500000,
+      region: "West — Jaipur",
+      latitude: 26.9124,
+      longitude: 75.7873,
+      status: "RETIRED",
+    },
+  });
+
+  const marutiEeco = await prisma.vehicle.create({
+    data: {
+      registrationNumber: "AP 09 OP 1122",
+      nameModel: "Maruti Eeco Cargo",
+      type: "MINI",
+      maxLoadCapacityKg: 600,
+      odometerKm: 15600,
+      acquisitionCost: 495000,
+      region: "South — Hyderabad",
+      latitude: 17.3850,
+      longitude: 78.4867,
+      status: "AVAILABLE",
+    },
+  });
+
+  // ─── Drivers ──────────────────────────────────────────
+  const arjun = await prisma.driver.create({
+    data: {
+      name: "Arjun Singh",
+      licenseNumber: "DL-20190012345",
+      licenseCategory: "HMV",
+      licenseExpiryDate: new Date("2029-03-15"),
+      contactNumber: "+91-9876543210",
       safetyScore: 96,
       status: "AVAILABLE",
     },
   });
-  const priya = await prisma.driver.create({
+
+  const meena = await prisma.driver.create({
     data: {
-      name: "Priya Nair",
-      licenseNumber: "DL-100987",
-      licenseCategory: "HMV",
-      licenseExpiryDate: new Date("2026-09-01"),
-      contactNumber: "+1-202-555-0199",
-      safetyScore: 91,
+      name: "Meena Devi",
+      licenseNumber: "MH-20200054321",
+      licenseCategory: "LMV",
+      licenseExpiryDate: new Date("2028-07-20"),
+      contactNumber: "+91-9812345678",
+      safetyScore: 92,
       status: "AVAILABLE",
     },
   });
-  const carlos = await prisma.driver.create({
+
+  const ravi = await prisma.driver.create({
     data: {
-      name: "Carlos Reyes",
-      licenseNumber: "DL-100555",
+      name: "Ravi Shankar",
+      licenseNumber: "KA-20180098765",
       licenseCategory: "HMV",
-      licenseExpiryDate: new Date("2026-01-15"),
-      contactNumber: "+1-202-555-0166",
-      safetyScore: 88,
-      status: "OFF_DUTY",
+      licenseExpiryDate: new Date("2025-11-30"),
+      contactNumber: "+91-9900112233",
+      safetyScore: 87,
+      status: "ON_TRIP",
     },
   });
-  await prisma.driver.create({
+
+  const fatima = await prisma.driver.create({
     data: {
-      name: "Megan Blake",
-      licenseNumber: "DL-100777",
+      name: "Fatima Begum",
+      licenseNumber: "TN-20210034567",
       licenseCategory: "LMV",
-      licenseExpiryDate: new Date("2025-11-20"),
-      contactNumber: "+1-202-555-0111",
-      safetyScore: 79,
-      status: "SUSPENDED",
-    },
-  });
-  const jordan = await prisma.driver.create({
-    data: {
-      name: "Jordan Lee",
-      licenseNumber: "DL-100333",
-      licenseCategory: "LMV",
-      licenseExpiryDate: new Date("2027-02-28"),
-      contactNumber: "+1-202-555-0177",
+      licenseExpiryDate: new Date("2026-06-10"),
+      contactNumber: "+91-9444556677",
       safetyScore: 94,
       status: "AVAILABLE",
     },
   });
 
-  const completedTrip = await prisma.trip.create({
+  const suresh = await prisma.driver.create({
     data: {
-      tripCode: "TR001",
-      source: "Central Depot",
-      destination: "North Warehouse",
-      vehicleId: truckEast.id,
-      driverId: priya.id,
-      cargoWeightKg: 9000,
-      plannedDistanceKm: 240,
+      name: "Suresh Patel",
+      licenseNumber: "GJ-20200076543",
+      licenseCategory: "HMV",
+      licenseExpiryDate: new Date("2025-09-01"),
+      contactNumber: "+91-9777889900",
+      safetyScore: 78,
+      status: "SUSPENDED",
+    },
+  });
+
+  const kavita = await prisma.driver.create({
+    data: {
+      name: "Kavita Joshi",
+      licenseNumber: "UP-20220011223",
+      licenseCategory: "LMV",
+      licenseExpiryDate: new Date("2030-01-25"),
+      contactNumber: "+91-9666778899",
+      safetyScore: 98,
+      status: "AVAILABLE",
+    },
+  });
+
+  const mohammed = await prisma.driver.create({
+    data: {
+      name: "Mohammed Ali",
+      licenseNumber: "RJ-20190044556",
+      licenseCategory: "HMV",
+      licenseExpiryDate: new Date("2025-12-20"),
+      contactNumber: "+91-9555667788",
+      safetyScore: 85,
+      status: "OFF_DUTY",
+    },
+  });
+
+  // ─── Trips ────────────────────────────────────────────
+  // Indian routes with realistic distances
+  const trip1 = await prisma.trip.create({
+    data: {
+      tripCode: "MUM-DEL-001",
+      source: "Mumbai Central Depot",
+      destination: "Delhi NCR Warehouse",
+      vehicleId: eicherPro.id,
+      driverId: arjun.id,
+      cargoWeightKg: 4200,
+      plannedDistanceKm: 1400,
       status: "COMPLETED",
-      dispatchedAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 3),
-      completedAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 2),
-      finalOdometerKm: 84210,
-      fuelConsumedL: 60,
-      revenue: 2400,
+      dispatchedAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 5),
+      completedAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 3),
+      finalOdometerKm: 67800,
+      fuelConsumedL: 180,
+      revenue: 42000,
     },
   });
 
-  await prisma.trip.create({
+  const trip2 = await prisma.trip.create({
     data: {
-      tripCode: "TR002",
-      source: "Central Depot",
-      destination: "East Yard",
-      vehicleId: vanNorth.id,
-      driverId: alex.id,
-      cargoWeightKg: 450,
-      plannedDistanceKm: 80,
-      status: "DRAFT",
-    },
-  });
-
-  await prisma.trip.create({
-    data: {
-      tripCode: "TR003",
-      source: "East Yard",
-      destination: "South Terminal",
-      vehicleId: vanEast.id,
-      driverId: jordan.id,
-      cargoWeightKg: 600,
-      plannedDistanceKm: 150,
+      tripCode: "BLR-CHN-002",
+      source: "Bangalore Silk Board",
+      destination: "Chennai Ambattur Industrial",
+      vehicleId: boleroPickup.id,
+      driverId: ravi.id,
+      cargoWeightKg: 800,
+      plannedDistanceKm: 350,
       status: "DISPATCHED",
       dispatchedAt: new Date(),
     },
   });
-  await prisma.vehicle.update({ where: { id: vanEast.id }, data: { status: "ON_TRIP" } });
-  await prisma.driver.update({ where: { id: jordan.id }, data: { status: "ON_TRIP" } });
+  await prisma.vehicle.update({ where: { id: boleroPickup.id }, data: { status: "ON_TRIP" } });
+  await prisma.driver.update({ where: { id: ravi.id }, data: { status: "ON_TRIP" } });
 
-  await prisma.trip.create({
+  const trip3 = await prisma.trip.create({
     data: {
-      tripCode: "TR004",
-      source: "North Warehouse",
-      destination: "Central Depot",
-      vehicleId: truckSouth.id,
-      driverId: carlos.id,
-      cargoWeightKg: 5000,
-      plannedDistanceKm: 300,
+      tripCode: "MUM-PUN-003",
+      source: "Mumbai Central Depot",
+      destination: "Pune Bhosari Industrial Area",
+      vehicleId: tataAce.id,
+      driverId: meena.id,
+      cargoWeightKg: 500,
+      plannedDistanceKm: 150,
+      status: "DRAFT",
+    },
+  });
+
+  const trip4 = await prisma.trip.create({
+    data: {
+      tripCode: "AMD-JAI-004",
+      source: "Ahmedabad Naroda",
+      destination: "Jaipur Sitapura Industrial",
+      vehicleId: bharatBenz.id,
+      driverId: mohammed.id,
+      cargoWeightKg: 12000,
+      plannedDistanceKm: 670,
       status: "CANCELLED",
+      cancelReason: "Driver unwell — reassigning",
     },
   });
 
-  await prisma.fuelLog.create({
+  const trip5 = await prisma.trip.create({
     data: {
-      vehicleId: truckEast.id,
-      tripId: completedTrip.id,
-      date: new Date(Date.now() - 1000 * 60 * 60 * 24 * 2),
-      liters: 60,
-      cost: 90,
-    },
-  });
-  await prisma.fuelLog.create({
-    data: {
-      vehicleId: vanNorth.id,
-      date: new Date(Date.now() - 1000 * 60 * 60 * 24 * 5),
-      liters: 35,
-      cost: 52.5,
-    },
-  });
-
-  await prisma.maintenanceLog.create({
-    data: {
-      vehicleId: miniWest.id,
-      serviceType: "Oil Change",
-      servicerName: "QuickFix Garage",
-      cost: 120,
-      date: new Date(Date.now() - 1000 * 60 * 60 * 24),
-      status: "ACTIVE",
-    },
-  });
-  await prisma.maintenanceLog.create({
-    data: {
-      vehicleId: truckEast.id,
-      serviceType: "Tyre Replacement",
-      servicerName: "Volvo Service Center",
-      cost: 800,
-      date: new Date(Date.now() - 1000 * 60 * 60 * 24 * 10),
+      tripCode: "HYD-BLR-005",
+      source: "Hyderabad Miyapur",
+      destination: "Bangalore Peenya Industrial",
+      vehicleId: marutiEeco.id,
+      driverId: fatima.id,
+      cargoWeightKg: 400,
+      plannedDistanceKm: 570,
       status: "COMPLETED",
+      dispatchedAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 7),
+      completedAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 6),
+      finalOdometerKm: 15600,
+      fuelConsumedL: 42,
+      revenue: 18000,
     },
   });
 
-  await prisma.expense.create({
-    data: {
-      vehicleId: truckEast.id,
-      tripId: completedTrip.id,
-      toll: 45,
-      otherMisc: 10,
-      total: 55,
-      status: "COMPLETED",
-    },
+  // ─── Fuel Logs (Indian diesel prices ~₹92-96/L) ──────
+  await prisma.fuelLog.createMany({
+    data: [
+      { vehicleId: eicherPro.id, tripId: trip1.id, date: new Date(Date.now() - 1000 * 60 * 60 * 24 * 4), liters: 180, cost: 16920 },
+      { vehicleId: tataAce.id, date: new Date(Date.now() - 1000 * 60 * 60 * 24 * 3), liters: 35, cost: 3290 },
+      { vehicleId: boleroPickup.id, tripId: trip2.id, date: new Date(Date.now() - 1000 * 60 * 60 * 2), liters: 45, cost: 4230 },
+      { vehicleId: marutiEeco.id, tripId: trip5.id, date: new Date(Date.now() - 1000 * 60 * 60 * 24 * 6), liters: 42, cost: 3948 },
+      { vehicleId: forceTraveller.id, date: new Date(Date.now() - 1000 * 60 * 60 * 24), liters: 60, cost: 5640 },
+    ],
   });
 
+  // ─── Maintenance (Indian garages) ─────────────────────
+  await prisma.maintenanceLog.createMany({
+    data: [
+      {
+        vehicleId: ashokLeyland.id,
+        serviceType: "Engine Overhaul",
+        servicerName: "Chennai Auto Works, Ambattur",
+        cost: 45000,
+        date: new Date(Date.now() - 1000 * 60 * 60 * 24),
+        status: "ACTIVE",
+      },
+      {
+        vehicleId: eicherPro.id,
+        serviceType: "Brake Pad Replacement",
+        servicerName: "Delhi Truck Service Center, Wazirabad",
+        cost: 8500,
+        date: new Date(Date.now() - 1000 * 60 * 60 * 24 * 15),
+        status: "COMPLETED",
+      },
+      {
+        vehicleId: tataSigna.id,
+        serviceType: "Clutch Plate Change",
+        servicerName: "Jaipur Heavy Vehicles Garage",
+        cost: 12000,
+        date: new Date(Date.now() - 1000 * 60 * 60 * 24 * 30),
+        status: "COMPLETED",
+      },
+      {
+        vehicleId: tataAce.id,
+        serviceType: "Oil Change & Filter",
+        servicerName: "Mumbai Tata Service, Andheri",
+        cost: 3500,
+        date: new Date(Date.now() - 1000 * 60 * 60 * 24 * 7),
+        status: "COMPLETED",
+      },
+      {
+        vehicleId: bharatBenz.id,
+        serviceType: "Tyre Replacement (6 tyres)",
+        servicerName: "Ahmedabad BharatBenz Dealer",
+        cost: 54000,
+        date: new Date(Date.now() - 1000 * 60 * 60 * 24 * 20),
+        status: "COMPLETED",
+      },
+    ],
+  });
+
+  // ─── Expenses (Indian tolls, GST) ─────────────────────
+  await prisma.expense.createMany({
+    data: [
+      { vehicleId: eicherPro.id, tripId: trip1.id, toll: 2350, otherMisc: 500, total: 2850, status: "COMPLETED" },
+      { vehicleId: boleroPickup.id, tripId: trip2.id, toll: 485, otherMisc: 150, total: 635, status: "PENDING" },
+      { vehicleId: marutiEeco.id, tripId: trip5.id, toll: 320, otherMisc: 200, total: 520, status: "COMPLETED" },
+      { vehicleId: bharatBenz.id, tripId: trip4.id, toll: 1100, otherMisc: 300, total: 1400, status: "PENDING" },
+    ],
+  });
+
+  // ─── Vehicle Positions (GPS pings) ────────────────────
+  // Simulated trip: boleroPickup moving Bangalore → Chennai on NH44
   const now = Date.now();
   const hour = 1000 * 60 * 60;
   await prisma.vehiclePosition.createMany({
     data: [
-      { vehicleId: vanEast.id, latitude: 22.5726, longitude: 88.3639, speed: 0, heading: 0, recordedAt: new Date(now - hour * 2) },
-      { vehicleId: vanEast.id, latitude: 22.5800, longitude: 88.3700, speed: 42, heading: 45, recordedAt: new Date(now - hour * 1.5) },
-      { vehicleId: vanEast.id, latitude: 22.5900, longitude: 88.3800, speed: 55, heading: 50, recordedAt: new Date(now - hour) },
-      { vehicleId: vanEast.id, latitude: 22.6000, longitude: 88.3950, speed: 60, heading: 48, recordedAt: new Date(now - hour * 0.5) },
-      { vehicleId: vanEast.id, latitude: 22.6100, longitude: 88.4100, speed: 48, heading: 42, recordedAt: new Date() },
-      { vehicleId: vanNorth.id, latitude: 28.6139, longitude: 77.2090, speed: 0, heading: 0, recordedAt: new Date(now - hour) },
-      { vehicleId: vanNorth.id, latitude: 28.6200, longitude: 77.2200, speed: 35, heading: 90, recordedAt: new Date() },
-      { vehicleId: truckEast.id, latitude: 22.5726, longitude: 88.3639, speed: 0, heading: 0, recordedAt: new Date(now - hour * 24 * 3) },
+      // Bolero on Bangalore → Chennai route
+      { vehicleId: boleroPickup.id, latitude: 12.9716, longitude: 77.5946, speed: 0, heading: 180, recordedAt: new Date(now - hour * 4) },
+      { vehicleId: boleroPickup.id, latitude: 12.9141, longitude: 77.6446, speed: 45, heading: 175, recordedAt: new Date(now - hour * 3.5) },
+      { vehicleId: boleroPickup.id, latitude: 12.7846, longitude: 77.7490, speed: 65, heading: 170, recordedAt: new Date(now - hour * 3) },
+      { vehicleId: boleroPickup.id, latitude: 12.5200, longitude: 77.8500, speed: 72, heading: 165, recordedAt: new Date(now - hour * 2) },
+      { vehicleId: boleroPickup.id, latitude: 12.2900, longitude: 78.0800, speed: 68, heading: 160, recordedAt: new Date(now - hour * 1) },
+      { vehicleId: boleroPickup.id, latitude: 12.1200, longitude: 78.2500, speed: 70, heading: 155, recordedAt: new Date() },
+      // Tata Ace in Mumbai
+      { vehicleId: tataAce.id, latitude: 19.0760, longitude: 72.8777, speed: 0, heading: 0, recordedAt: new Date(now - hour * 2) },
+      { vehicleId: tataAce.id, latitude: 19.1200, longitude: 72.8500, speed: 30, heading: 315, recordedAt: new Date() },
+      // Eicher parked in Delhi after trip
+      { vehicleId: eicherPro.id, latitude: 28.6139, longitude: 77.2090, speed: 0, heading: 0, recordedAt: new Date(now - hour * 24) },
     ],
   });
 
-  console.log("Seed complete.");
+  console.log("Seed complete — all Indian data loaded.");
 }
 
 main()
