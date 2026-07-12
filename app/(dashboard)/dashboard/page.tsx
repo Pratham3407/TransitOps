@@ -1,10 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { Card, KpiCard } from "@/components/Card";
+import { inputClass } from "@/components/FormField";
 
 type Stats = {
+  filters?: { type: string | null; status: string | null; region: string | null };
   vehicles: {
     total: number;
     available: number;
@@ -31,15 +33,24 @@ type Stats = {
   expiringLicenses: number;
 };
 
+const VEHICLE_TYPES = ["VAN", "TRUCK", "MINI", "OTHER"];
+const VEHICLE_STATUSES = ["AVAILABLE", "ON_TRIP", "IN_SHOP", "RETIRED"];
+
 export default function DashboardPage() {
   const router = useRouter();
   const [stats, setStats] = useState<Stats | null>(null);
+  const [regions, setRegions] = useState<string[]>([]);
+  const [filters, setFilters] = useState({ type: "", status: "", region: "" });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    let active = true;
-    fetch("/api/dashboard/stats", { credentials: "include" })
+  const load = useCallback(async () => {
+    const params = new URLSearchParams();
+    if (filters.type) params.set("type", filters.type);
+    if (filters.status) params.set("status", filters.status);
+    if (filters.region) params.set("region", filters.region);
+    const qs = params.toString();
+    fetch(`/api/dashboard/stats${qs ? `?${qs}` : ""}`, { credentials: "include" })
       .then(async (res) => {
         if (res.status === 401) {
           window.location.href = "/login";
@@ -49,13 +60,26 @@ export default function DashboardPage() {
         return res.json();
       })
       .then((data) => {
-        if (active && data) setStats(data);
+        if (data) setStats(data);
       })
-      .catch((e) => active && setError(e.message))
-      .finally(() => active && setLoading(false));
-    return () => {
-      active = false;
-    };
+      .catch((e) => setError(e.message))
+      .finally(() => setLoading(false));
+  }, [filters]);
+
+  useEffect(() => {
+    load();
+  }, [load]);
+
+  useEffect(() => {
+    fetch("/api/vehicles", { credentials: "include" })
+      .then((r) => r.json())
+      .then((d) => {
+        const rs = Array.from(
+          new Set((d.vehicles ?? []).map((v: { region: string | null }) => v.region).filter(Boolean))
+        ) as string[];
+        setRegions(rs);
+      })
+      .catch(() => {});
   }, []);
 
   return (
@@ -66,6 +90,70 @@ export default function DashboardPage() {
           Smart Transport Operations Platform - Fleet Management System
         </p>
       </div>
+
+      <Card>
+        <div className="flex flex-wrap items-end gap-3">
+          <div>
+            <label className="mb-1 block text-xs font-medium text-zinc-500">Vehicle Type</label>
+            <select
+              className={inputClass}
+              value={filters.type}
+              onChange={(e) => setFilters({ ...filters, type: e.target.value })}
+            >
+              <option value="">All</option>
+              {VEHICLE_TYPES.map((t) => (
+                <option key={t} value={t}>
+                  {t}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label className="mb-1 block text-xs font-medium text-zinc-500">Status</label>
+            <select
+              className={inputClass}
+              value={filters.status}
+              onChange={(e) => setFilters({ ...filters, status: e.target.value })}
+            >
+              <option value="">All</option>
+              {VEHICLE_STATUSES.map((s) => (
+                <option key={s} value={s}>
+                  {s.replaceAll("_", " ")}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label className="mb-1 block text-xs font-medium text-zinc-500">Region</label>
+            <select
+              className={inputClass}
+              value={filters.region}
+              onChange={(e) => setFilters({ ...filters, region: e.target.value })}
+            >
+              <option value="">All</option>
+              {regions.map((r) => (
+                <option key={r} value={r}>
+                  {r}
+                </option>
+              ))}
+            </select>
+          </div>
+          <button
+            onClick={() => setFilters({ type: "", status: "", region: "" })}
+            className="rounded-lg border border-zinc-300 px-3 py-2 text-sm font-medium text-zinc-700 hover:bg-zinc-50"
+          >
+            Clear Filters
+          </button>
+          {(filters.type || filters.status || filters.region) && (
+            <span className="text-xs text-zinc-500">
+              Filtered by{" "}
+              {[filters.type, filters.status && `status: ${filters.status}`, filters.region && `region: ${filters.region}`]
+                .filter(Boolean)
+                .join(", ")}
+            </span>
+          )}
+        </div>
+      </Card>
 
       {loading && (
         <p className="text-sm text-zinc-500">Loading live metrics…</p>

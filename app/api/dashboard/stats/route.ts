@@ -6,6 +6,17 @@ export async function GET(request: NextRequest) {
   const session = withAuth(request, null);
   if (isResponse(session)) return session;
 
+  const { searchParams } = new URL(request.url);
+  const type = searchParams.get("type");
+  const status = searchParams.get("status");
+  const region = searchParams.get("region");
+
+  const vehicleWhere = {
+    ...(type ? { type: type as never } : {}),
+    ...(status ? { status: status as never } : {}),
+    ...(region ? { region } : {}),
+  };
+
   const [
     vehicles,
     drivers,
@@ -13,10 +24,10 @@ export async function GET(request: NextRequest) {
     maintenanceActive,
     expiringLicenses,
   ] = await Promise.all([
-    prisma.vehicle.groupBy({ by: ["status"], _count: { _all: true } }),
+    prisma.vehicle.groupBy({ by: ["status"], where: vehicleWhere, _count: { _all: true } }),
     prisma.driver.groupBy({ by: ["status"], _count: { _all: true } }),
     prisma.trip.groupBy({ by: ["status"], _count: { _all: true } }),
-    prisma.maintenanceLog.count({ where: { status: "ACTIVE" } }),
+    prisma.maintenanceLog.count({ where: { status: "ACTIVE", vehicle: vehicleWhere } }),
     prisma.driver.count({
       where: {
         licenseExpiryDate: { lte: new Date(Date.now() + 1000 * 60 * 60 * 24 * 30) },
@@ -41,6 +52,7 @@ export async function GET(request: NextRequest) {
       : 0;
 
   return NextResponse.json({
+    filters: { type: type ?? null, status: status ?? null, region: region ?? null },
     vehicles: {
       total: totalVehicles,
       available: vehicleBy("AVAILABLE"),
